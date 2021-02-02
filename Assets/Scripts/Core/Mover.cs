@@ -2,20 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-
+using RPG.Combat;
+using RPG.Core;
 namespace RPG.Movement
 {
-    public class Mover : MonoBehaviour
+    public class Mover : MonoBehaviour,IAction
     {
 
         //Cached Components
         private NavMeshAgent agent;
         private Animator anim;
+        private Fighter fighter;
+        private ActionScheduler scheduler;
 
-
+        public void StartMoveAction(Vector3 destination, NavMeshAgent agent)
+        {
+            scheduler.StartAction(this);
+            MoveTo(destination, agent);
+        }
         public void MoveTo(Vector3 destination, NavMeshAgent agent)
         {
+            
             agent.destination = destination;
+            agent.isStopped = false;
         }
 
         private void UpdateAnimator()
@@ -27,11 +36,17 @@ namespace RPG.Movement
 
             anim.SetFloat("forwardSpeed", localVelocity.z);
         }
-
+        public void Cancel()
+        {
+            agent.isStopped = true;
+        }
+      
         void Start()
         {
+            scheduler = GetComponent<ActionScheduler>();
             anim = GetComponentInChildren<Animator>();
             agent = GetComponent<NavMeshAgent>();
+            fighter = GetComponent<Fighter>();
         }
 
         // Update is called once per frame
