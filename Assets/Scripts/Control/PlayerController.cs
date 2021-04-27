@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using RPG.Combat;
 using System;
+using RPG.Core;
 
 namespace RPG.Controller
 {
@@ -17,10 +18,11 @@ namespace RPG.Controller
         private NavMeshAgent agent;
         private Mover mover;
         private Fighter fighter;
-
+        private Health health;
 
         void Start()
         {
+            health = GetComponent<Health>();
             agent = GetComponent<NavMeshAgent>();
             mover = GetComponent<Mover>();
             fighter = GetComponent<Fighter>();
@@ -29,6 +31,7 @@ namespace RPG.Controller
         // Update is called once per frame
         void Update()
         {
+            if (health.IsDead()) return;
             if (InteractWithCombat()) return;
             if (InteractWithMovement()) return;
 
@@ -41,13 +44,16 @@ namespace RPG.Controller
 
             foreach(RaycastHit hit in hits)
             {
-               
+               //check if the clickable object has a combat target if not fail
                     CombatTarget target = hit.collider.GetComponent<CombatTarget>();
-                if (!fighter.CanAttack(target))
+                if(target==null)continue;
+
+                //Checks if it has a health compnent if not fail
+                if (!fighter.CanAttack(target.gameObject))
                     continue;
 
                 if(Input.GetMouseButtonDown(0))
-                   fighter.Attack(hit.collider.GetComponent<CombatTarget>());
+                   fighter.Attack(target.gameObject);
                  return true;
  
 
@@ -64,7 +70,7 @@ namespace RPG.Controller
             if (hashit)
             {
                 if (Input.GetMouseButton(0))
-                    mover.StartMoveAction(hit.point, agent);
+                    mover.StartMoveAction(hit.point, agent,1);
                 return true;
             }
             return false;

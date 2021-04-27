@@ -19,10 +19,10 @@ namespace RPG.Combat
         //Stats
         [SerializeField] float timeBetweenAttacks=1f;
         [SerializeField] float weaponRange = 2f;
-        private float timeSinceLastAttack=0;
+        private float timeSinceLastAttack=Mathf.Infinity;
        [SerializeField] float damage=5f;
 
-        public bool CanAttack(CombatTarget target)
+        public bool CanAttack(GameObject target)
         {
             if (target == null)
                 return false;
@@ -30,17 +30,12 @@ namespace RPG.Combat
             return targetToTest != null & !targetToTest.IsDead();
         }
 
-        public void Attack(CombatTarget combatTarget)
+        public void Attack(GameObject combatTarget)
         {
             target = combatTarget.GetComponent<Health>();
             scheduler.StartAction(this);
-            print("BANG BOOM STRAIGHT TO THE MOON");
-           
+            print("BANG BOOM STRAIGHT TO THE MOON"); 
         }
-     
-
-    
-
         private void AttackBehaviour()
         {
             //A little bit different from lesson in lesson if dead he puts a return in 
@@ -75,6 +70,7 @@ namespace RPG.Combat
         {
             target = null;
             StopAttackAnims();
+            GetComponent<Mover>().Cancel();
         }
 
         private void StopAttackAnims()
@@ -95,7 +91,7 @@ namespace RPG.Combat
             timeSinceLastAttack += Time.deltaTime;
             if (target != null)
             {
-                mover.MoveTo(target.transform.position, agent);
+                mover.MoveTo(target.transform.position, agent,1);
                 if (TargetIsInWeaponRange())
                 {
                     mover.Cancel();

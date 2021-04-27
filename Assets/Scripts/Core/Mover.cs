@@ -15,15 +15,18 @@ namespace RPG.Movement
         private Fighter fighter;
         private ActionScheduler scheduler;
 
-        public void StartMoveAction(Vector3 destination, NavMeshAgent agent)
+        [SerializeField] float maxSpeed = 6;
+
+        public void StartMoveAction(Vector3 destination, NavMeshAgent agent,float speedFraction)
         {
             scheduler.StartAction(this);
-            MoveTo(destination, agent);
+            MoveTo(destination, agent,speedFraction);
         }
-        public void MoveTo(Vector3 destination, NavMeshAgent agent)
+        public void MoveTo(Vector3 destination, NavMeshAgent agent,float speedFraction)
         {
             
             agent.destination = destination;
+            agent.speed = maxSpeed * Mathf.Clamp01(speedFraction);
             agent.isStopped = false;
         }
 
